@@ -1,0 +1,29 @@
+Bootstrap: docker
+From: centos:7
+Stage: build
+
+%post
+  ## Download build prerequisites
+  yum -y install bzip2-devel gcc gcc-c++ git make xz-devel zlib-devel
+  
+  ## Build and Install
+  cd /opt
+  git clone --recursive https://github.com/walaj/svaba
+  cd svaba
+  git checkout c0fecb6
+  ./configure
+  make
+
+Bootstrap: docker
+From: centos:7
+Stage: final
+
+%labels
+Maintainer eric.burgueno@plantandfood.co.nz
+Version 1.1.3
+
+%files from build
+  /opt/svaba/src/svaba/svaba /usr/local/bin
+
+%runscript
+  exec svaba "$@"
